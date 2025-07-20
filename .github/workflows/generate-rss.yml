@@ -15,6 +15,11 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    # This grants the GITHUB_TOKEN write permissions for this job,
+    # allowing it to push changes back to the repository.
+    permissions:
+      contents: write
+
     steps:
       # 1. Checks out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: Checkout repository
