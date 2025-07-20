@@ -103,7 +103,11 @@ async function generateRssFeed() {
       });
     });
 
-    const xml = feed.xml({ indent: true });
+    let xml = feed.xml({ indent: true });
+    
+    // Remove the lastBuildDate tag entirely to prevent unnecessary commits.
+    xml = xml.replace(/^\s*<lastBuildDate>.*<\/lastBuildDate>\n/gm, "");
+    
     fs.writeFileSync("feed.xml", xml);
 
     console.log(
