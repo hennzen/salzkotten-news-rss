@@ -45,7 +45,7 @@ jobs:
       - name: Commit and push if changed
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: "chore: Update RSS feed"
+          commit_message: "Update RSS feed"
           file_pattern: "feed.xml" # Only commit the feed.xml file
           commit_user_name: "GitHub Actions Bot"
           commit_user_email: "github-actions[bot]@users.noreply.github.com"
