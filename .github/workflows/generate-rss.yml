@@ -1,0 +1,47 @@
+# .github/workflows/generate-rss.yml
+
+name: Generate RSS Feed
+
+# Controls when the action will run.
+on:
+  # Runs on a schedule (every hour at the top of the hour)
+  schedule:
+    - cron: "0 * * * *"
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Checks out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. Sets up Node.js environment
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20.x" # Use a long-term support version of Node.js
+          cache: "npm" # Cache npm dependencies for faster builds
+
+      # 3. Install dependencies using the lockfile for reproducibility
+      - name: Install dependencies
+        run: npm ci
+
+      # 4. Run the RSS generation script
+      - name: Generate RSS feed
+        run: node generate-rss.js
+
+      # 5. Commit the generated feed.xml file back to the repository
+      # This action checks for changes and commits them automatically.
+      - name: Commit and push if changed
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore: Update RSS feed"
+          file_pattern: "feed.xml" # Only commit the feed.xml file
+          commit_user_name: "GitHub Actions Bot"
+          commit_user_email: "github-actions[bot]@users.noreply.github.com"
+          commit_author: "GitHub Actions Bot <github-actions[bot]@users.noreply.github.com>"
