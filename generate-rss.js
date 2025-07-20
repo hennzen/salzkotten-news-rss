@@ -1,4 +1,4 @@
-// generate-rss.js (based on DOM-samples/li.listEntry.html HTML structure with sequential crawler for all pages)
+// generate-rss.js (based on DOM-samples/li.listEntry.html HTML structure with sequential crawler for all pages with stable pubDate)
 const fs = require("fs");
 const axios = require("axios");
 const cheerio = require("cheerio");
@@ -41,16 +41,6 @@ function scrapeItemsFromHtml(html) {
 async function generateRssFeed() {
   console.log("Starting RSS feed generation...");
 
-  const feed = new RSS({
-    title: "Stadt Salzkotten - News und Presse (All Pages)",
-    description:
-      "Aktuelle Nachrichten und Pressemitteilungen der Stadt Salzkotten",
-    feed_url: `${SITE_URL}/feed.xml`,
-    site_url: SITE_URL,
-    language: "de",
-    pubDate: new Date(),
-  });
-
   try {
     let allArticles = [];
     let currentPageUrl = BASE_NEWS_URL;
@@ -87,7 +77,23 @@ async function generateRssFeed() {
     // Sort all collected articles by date, newest first
     allArticles.sort((a, b) => b.date - a.date);
 
-    // Add all sorted articles to the feed
+    // 1. Determine the feed's publication date. Use the date of the newest article,
+    //    or the current time if no articles are found (edge case).
+    const feedPubDate =
+      allArticles.length > 0 ? allArticles[0].date : new Date();
+
+    // 2. Create the RSS feed object *after* all articles are scraped and sorted.
+    const feed = new RSS({
+      title: "Stadt Salzkotten - News und Presse (All Pages)",
+      description:
+        "Aktuelle Nachrichten und Pressemitteilungen der Stadt Salzkotten",
+      feed_url: `${SITE_URL}/feed.xml`,
+      site_url: SITE_URL,
+      language: "de",
+      pubDate: feedPubDate, // Use the determined stable date
+    });
+
+    // 3. Add all sorted articles to the feed
     allArticles.forEach((article) => {
       feed.item({
         title: article.title,
