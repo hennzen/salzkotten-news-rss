@@ -39,40 +39,84 @@ function scrapeItemsFromHtml(html) {
 }
 
 async function generateRssFeed() {
+  const fullCrawl = process.argv[2] === "--full";
+
   console.log("Starting RSS feed generation...");
 
   try {
     let allArticles = [];
-    let currentPageUrl = BASE_NEWS_URL;
-    let pageCount = 1;
 
-    // Use a while loop to crawl through pages as long as a "next" link is found
-    while (currentPageUrl) {
-      console.log(`Fetching page ${pageCount}: ${currentPageUrl}`);
-      const response = await axios.get(currentPageUrl);
-      const html = response.data;
+    if (fullCrawl) {
+      // Full crawl logic, executed only with --full, scanning all pages
+      console.log("Performing a full crawl of all pages.");
+      let currentPageUrl = BASE_NEWS_URL;
+      let pageCount = 1;
 
-      // Scrape items from the current page and add them to our master list
-      const pageArticles = scrapeItemsFromHtml(html);
-      allArticles = allArticles.concat(pageArticles);
+      // Use a while loop to crawl through pages as long as a "next" link is found
+      while (currentPageUrl) {
+        console.log(`Fetching page ${pageCount}: ${currentPageUrl}`);
+        const response = await axios.get(currentPageUrl);
+        const html = response.data;
 
-      // Look for the link to the next page
-      const $ = cheerio.load(html);
-      const nextLink = $("a.pageNaviNextLink");
+        // Scrape items from the current page and add them to our master list
+        const pageArticles = scrapeItemsFromHtml(html);
+        allArticles = allArticles.concat(pageArticles);
 
-      if (nextLink.length > 0) {
-        const nextHref = nextLink.attr("href");
-        // The href is relative, so we resolve it against the base news URL
-        currentPageUrl = new URL(nextHref, BASE_NEWS_URL).href;
-        pageCount++;
-      } else {
-        // No "next" link found, we've reached the last page
-        console.log("No more pages found. Concluding crawl.");
-        currentPageUrl = null;
+        // Look for the link to the next page
+        const $ = cheerio.load(html);
+        const nextLink = $("a.pageNaviNextLink");
+
+        if (nextLink.length > 0) {
+          const nextHref = nextLink.attr("href");
+          // The href is relative, so we resolve it against the base news URL
+          currentPageUrl = new URL(nextHref, BASE_NEWS_URL).href;
+          pageCount++;
+        } else {
+          // No "next" link found, we've reached the last page
+          console.log("No more pages found. Concluding crawl.");
+          currentPageUrl = null;
+        }
       }
-    }
+      console.log(
+        `Finished fetching. Found ${allArticles.length} articles across ${pageCount} pages.`
+      );
+    } else {
+      
+      // Quick update logic, scanning only the first page
+      console.log("Performing a quick update check of the first page.");
+      // 1. Load existing articles from the feed file.
+      if (fs.existsSync("feed.xml")) {
+        const existingXml = fs.readFileSync("feed.xml", "utf-8");
+        const $ = cheerio.load(existingXml, { xmlMode: true });
+        $("item").each((i, el) => {
+          const item = $(el);
+          allArticles.push({
+            title: item.find("title").text(),
+            description: item.find("description").text(),
+            url: item.find("link").text(),
+            date: new Date(item.find("pubDate").text()),
+          });
+        });
+      }
+      const existingUrls = new Set(allArticles.map((a) => a.url));
 
-    console.log(`Finished fetching. Found ${allArticles.length} articles across ${pageCount} pages.`);
+      // 2. Scrape only the first page.
+      const response = await axios.get(BASE_NEWS_URL);
+      const latestArticles = scrapeItemsFromHtml(response.data);
+
+      // 3. Filter for articles that are actually new.
+      const newArticles = latestArticles.filter(
+        (a) => !existingUrls.has(a.url)
+      );
+
+      if (newArticles.length === 0) {
+        console.log("No new articles found. Feed is up to date.");
+        return; // Exit cleanly without writing a file.
+      }
+
+      console.log(`Found ${newArticles.length} new articles. Updating feed.`);
+      allArticles = newArticles.concat(allArticles);
+    }
 
     // Sort all collected articles by date, newest first
     allArticles.sort((a, b) => b.date - a.date);
@@ -104,10 +148,10 @@ async function generateRssFeed() {
     });
 
     let xml = feed.xml({ indent: true });
-    
+
     // Remove the lastBuildDate tag entirely to prevent unnecessary commits.
     xml = xml.replace(/^\s*<lastBuildDate>.*<\/lastBuildDate>\n/gm, "");
-    
+
     fs.writeFileSync("feed.xml", xml);
 
     console.log(
