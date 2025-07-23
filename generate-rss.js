@@ -6,6 +6,9 @@ const RSS = require("rss");
 
 const SITE_URL = "https://www.salzkotten.de";
 const BASE_NEWS_URL = `${SITE_URL}/de/aktuelles/news-und-presse.php`;
+// The number of items on a single page. This is used to determine
+// which articles should be checked for deletion during a quick update.
+const PAGE_SIZE = 20;
 
 /**
  * A reusable function to scrape news items from a given HTML content.
@@ -40,15 +43,18 @@ function scrapeItemsFromHtml(html) {
 
 async function generateRssFeed() {
   const fullCrawl = process.argv[2] === "--full";
+  const DELETED_PREFIX = "[GELÖSCHT] ";
 
   console.log("Starting RSS feed generation...");
 
   try {
     let allArticles = [];
+    let hasChanges = false;
 
     if (fullCrawl) {
       // Full crawl logic, executed only with --full, scanning all pages
       console.log("Performing a full crawl of all pages.");
+      hasChanges = true; // A full crawl always assumes changes and rewrites the file.
       let currentPageUrl = BASE_NEWS_URL;
       let pageCount = 1;
 
@@ -93,7 +99,7 @@ async function generateRssFeed() {
           allArticles.push({
             title: item.find("title").text(),
             description: item.find("description").text(),
-            url: item.find("link").text(),
+            url: item.find("guid").text(), // Use guid for the URL
             date: new Date(item.find("pubDate").text()),
           });
         });
@@ -103,19 +109,32 @@ async function generateRssFeed() {
       // 2. Scrape only the first page.
       const response = await axios.get(BASE_NEWS_URL);
       const latestArticles = scrapeItemsFromHtml(response.data);
+      const latestUrls = new Set(latestArticles.map((a) => a.url));
 
-      // 3. Filter for articles that are actually new.
+      // 3. Check for new articles.
       const newArticles = latestArticles.filter(
         (a) => !existingUrls.has(a.url)
       );
-
-      if (newArticles.length === 0) {
-        console.log("No new articles found. Feed is up to date.");
-        return; // Exit cleanly without writing a file.
+      if (newArticles.length > 0) {
+        hasChanges = true;
+        console.log(`Found ${newArticles.length} new articles. Updating feed.`);
+        allArticles = newArticles.concat(allArticles);
       }
 
-      console.log(`Found ${newArticles.length} new articles. Updating feed.`);
-      allArticles = newArticles.concat(allArticles);
+      // 4. Check for deleted articles by comparing the expected first page with the actual first page.
+      const articlesToCheckForDeletion = allArticles.slice(0, PAGE_SIZE);
+      articlesToCheckForDeletion.forEach((article) => {
+        if (!latestUrls.has(article.url) && !article.title.startsWith(DELETED_PREFIX)) {
+          hasChanges = true;
+          console.log(`Marking as deleted: ${article.date.toISOString().slice(0, 10)} - ${article.title}`);
+          article.title = DELETED_PREFIX + article.title;
+        }
+      });
+
+      if (!hasChanges) {
+        console.log("No new or deleted articles found. Feed is up to date.");
+        return; // Exit cleanly without writing a file.
+      }
     }
 
     // Sort all collected articles by date, newest first
@@ -139,10 +158,17 @@ async function generateRssFeed() {
 
     // 3. Add all sorted articles to the feed
     allArticles.forEach((article) => {
+      // Add a canonical link back to the main news page in every description
+      const canonicalLinkHtml = `<br><hr><p><small>Aktuelle Übersicht immer unter: <a href="${BASE_NEWS_URL}">${BASE_NEWS_URL}</a></small></p>`;
+      // Ensure we use the base description, even if it was already modified.
+      const baseDescription = article.description.split("<br><hr>")[0];
+      const finalDescription = baseDescription + canonicalLinkHtml;
+
       feed.item({
         title: article.title,
-        description: article.description,
+        description: finalDescription,
         url: article.url,
+        guid: article.url, // Use the URL as the unique identifier
         date: article.date,
       });
     });
