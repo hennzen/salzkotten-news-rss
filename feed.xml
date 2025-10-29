@@ -5,8 +5,15 @@
         <link>https://www.salzkotten.de</link>
         <generator>RSS for Node</generator>
         <atom:link href="https://www.salzkotten.de/feed.xml" rel="self" type="application/rss+xml"/>
-        <pubDate>Tue, 28 Oct 2025 00:00:00 GMT</pubDate>
+        <pubDate>Wed, 29 Oct 2025 00:00:00 GMT</pubDate>
         <language><![CDATA[de]]></language>
+        <item>
+            <title><![CDATA[Digitale Rechnung: Sicher, schnell und ressourcenschonend]]></title>
+            <description><![CDATA[Stadt Salzkotten nimmt E-Rechnungen an<br><hr><p><small>Aktuelle Übersicht immer unter: <a href="https://www.salzkotten.de/de/aktuelles/news-und-presse.php">https://www.salzkotten.de/de/aktuelles/news-und-presse.php</a></small></p>]]></description>
+            <link>https://www.salzkotten.de/de/aktuelles/news-und-pressemeldungen/e-rechnung.php</link>
+            <guid isPermaLink="false">https://www.salzkotten.de/de/aktuelles/news-und-pressemeldungen/e-rechnung.php</guid>
+            <pubDate>Wed, 29 Oct 2025 00:00:00 GMT</pubDate>
+        </item>
         <item>
             <title><![CDATA[Erneuerung der Pegelanlage an der Heder in Upsprunge]]></title>
             <description><![CDATA[Das Landesamt für Natur, Umwelt und Klima Nordrhein-Westfalen erneuert in den kommenden Tagen die Pegelanlage an der Heder in Upsprunge.<br><hr><p><small>Aktuelle Übersicht immer unter: <a href="https://www.salzkotten.de/de/aktuelles/news-und-presse.php">https://www.salzkotten.de/de/aktuelles/news-und-presse.php</a></small></p>]]></description>
