@@ -5,8 +5,15 @@
         <link>https://www.salzkotten.de</link>
         <generator>RSS for Node</generator>
         <atom:link href="https://www.salzkotten.de/feed.xml" rel="self" type="application/rss+xml"/>
-        <pubDate>Tue, 25 Aug 2026 00:00:00 GMT</pubDate>
+        <pubDate>Fri, 28 Aug 2026 00:00:00 GMT</pubDate>
         <language><![CDATA[de]]></language>
+        <item>
+            <title><![CDATA[Neues Programm, neue Internetseite, neue Impulse - die VHS vor Ort präsentiert das Programm „Herbst · Winter 2026/2027“]]></title>
+            <description><![CDATA[Mit dem Programm „Herbst · Winter 2026/2027“ präsentiert die VHS vor Ort mehr als 730 Bildungsangebote. Die Kurse, Vorträge, Workshops und Studienfahrten laden dazu ein, Neues zu entdecken, ...<br><hr><p><small>Aktuelle Übersicht immer unter: <a href="https://www.salzkotten.de/de/aktuelles/news-und-presse.php">https://www.salzkotten.de/de/aktuelles/news-und-presse.php</a></small></p>]]></description>
+            <link>https://www.salzkotten.de/de/aktuelles/news-und-pressemeldungen/Neues-Programm-neue-Internetseite-neue-Impulse.php</link>
+            <guid isPermaLink="false">https://www.salzkotten.de/de/aktuelles/news-und-pressemeldungen/Neues-Programm-neue-Internetseite-neue-Impulse.php</guid>
+            <pubDate>Fri, 28 Aug 2026 00:00:00 GMT</pubDate>
+        </item>
         <item>
             <title><![CDATA[Gemeinsam für mehr Gesundheit in Salzkotten]]></title>
             <description><![CDATA[Die beiden Gesundheitsinitiativen „Gesunde Kommune“ und „Glückskinder und Glücksboten“ wollen in Salzkotten künftig noch enger zusammenarbeiten. 
@@ -135,7 +142,7 @@ Bereits seit 2024 sind die „Glückskinder und ...<br><hr><p><small>Aktuelle Ü
             <pubDate>Thu, 09 Jul 2026 00:00:00 GMT</pubDate>
         </item>
         <item>
-            <title><![CDATA[Einschränkungen im Freibad "Sälzer Lagune" vom 13. bis 17. Juli 2026]]></title>
+            <title><![CDATA[[GELÖSCHT] Einschränkungen im Freibad "Sälzer Lagune" vom 13. bis 17. Juli 2026]]></title>
             <description><![CDATA[Im Zeitraum vom 13. bis 17. Juli 2026 kommt es im Freibad aufgrund des Aufbaus der neuen Wasserrutsche zu vorübergehenden Einschränkungen.<br><hr><p><small>Aktuelle Übersicht immer unter: <a href="https://www.salzkotten.de/de/aktuelles/news-und-presse.php">https://www.salzkotten.de/de/aktuelles/news-und-presse.php</a></small></p>]]></description>
             <link>https://www.salzkotten.de/de/aktuelles/news-und-pressemeldungen/Information-zur-Saelzer-Lagune-Wasserrutsche.php</link>
             <guid isPermaLink="false">https://www.salzkotten.de/de/aktuelles/news-und-pressemeldungen/Information-zur-Saelzer-Lagune-Wasserrutsche.php</guid>
